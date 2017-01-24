@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <span id="ttt" class="ssz-field">
+        <span sel_root class="root">
+            <var sel_word>a</var>
+            <var sel_word>b</var>
+            <span sel_leaf class="supsub">
+                <sup>
+                  <span sel_word>1</span>
+                  <span sel_leaf class="supsub">
+                    <sup>
+                      <span sel_word>2</span>
+                    </sup>
+                    <sub>
+                      <span sel_word>3</span>
+                    </sub>
+                  </span>
+                </sup>
+            </span>
+            <span sel_word>+</span>
+            <var sel_word>b</var>
+            <span sel_leaf class="supsub">
+                <sub>
+                  <span sel_word>b</span>
+                </sub>
+            </span>
+            <span sel_word>−</span>
+            <span sel_leaf class="fraction">
+                <span class="numerator">
+                  <span sel_word>1</span>
+                </span>
+                <span class="denominator">
+                  <span sel_word>2</span>
+                </span>
+            </span>
+            <span sel_leaf class="supsub">
+                <sup>
+                  <var sel_word>b</var>
+                  <var sel_word>a</var>
+                </sup>
+            </span>
+            <span sel_word>/</span>
+            <span sel_leaf class="supsub">
+                <sub>
+                  <var sel_word class="empty-word"></var>
+                </sub>
+            </span>
+            <span sel_word>+</span>
+            <var sel_word>x</var>
+            <span sel_leaf class="supsub">
+                <sup>
+                  <var sel_word>a</var>
+                </sup>
+                <sub>
+                  <var sel_word>b</var>
+                </sub>
+            </span>
+            <span sel_leaf class="bar">
+                <var sel_word>a</var>
+            </span>
+            <span sel_leaf class="sqrt">
+                <span class="prefix">√</span>
+                <span class="stem">
+                    <var sel_word>a</var>
+                    <var sel_word>b</var>
+                    <var sel_word>c</var>
+                </span>
+            </span>
+            <span sel_leaf class="multi multi-4">
+                <span class="left-brac">{</span>
+                <span class="content">
+                    <span sel_leaf class="line">
+                      <span sel_word>l</span>
+                      <span sel_word>i</span>
+                      <span sel_word>n</span>
+                      <span sel_word>e</span>
+                      <span sel_word>1</span>
+                    </span>
+                    <span sel_leaf class="line">
+                      <span sel_word>l</span>
+                      <span sel_word>i</span>
+                      <span sel_word>n</span>
+                      <span sel_word>e</span>
+                      <span sel_word>2</span>
+                    </span>
+                    <span sel_leaf class="line">
+                      <span sel_word>l</span>
+                      <span sel_word>i</span>
+                      <span sel_word>n</span>
+                      <span sel_word>e</span>
+                      <span sel_word>3</span>
+                    </span>
+                    <span sel_leaf class="line">
+                      <span sel_word>l</span>
+                      <span sel_word>i</span>
+                      <span sel_word>n</span>
+                      <span sel_word>e</span>
+                      <span sel_word>4</span>
+                    </span>
+                </span>
+                <span class="right-brac">}</span>
+            </span>
+        </span>
+    </span>
+</body>
+<script type="text/javascript" src="t2.js"></script>
+<script>
+
+  const html = $('#ttt').children('.root').html().replace(/\n\s+/g, '');
+  $('#ttt').children('.root').html(html);
+
+  new SSZQ(document.getElementById('ttt')).editable();
+//  new SSZQ(document.getElementById('ttt') ,'ab^{2}+\\times\\div b_{g^{3}}−\\frac{\\frac{a}{b}}{\\frac{x}{y}}+x^{a}_{b}\\bar{a}\\sqrt{abc}\\begin{cases}line1\\\\line2\\\\line3\\\\line4\\end{cases}\\begin{cases}line1\\\\line2\\\\line3\\\\line4\\end{cases}');
+</script>
+<style>
+.ssz-field {
+  font-family: Symbola, "Times New Roman", serif;
+  line-height: 1;
+  font-size: 28px;
+}
+.root {
+  cursor: text;
+  letter-spacing: 0.06em;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  vertical-align: middle;
+}
+
+.root .empty-word:after {
+  content: 'c';
+  visibility: hidden;
+}
+.root .empty-word {
+  width: 1em;
+  background: #ccc;
+}
+
+.cursor {
+  position: relative;
+  z-index: 10;
+  margin-left: -1px;
+  border-left: 1px solid transparent;
+}
+.cursor.blink {
+  border-left: 1px solid;
+}
+
+/** 分数 **/
+.fraction {
+    display: inline-block;
+    font-size: 90%;
+    text-align: center;
+    vertical-align: inherit;
+    position: relative;
+    top: -0.12em;
+}
+.numerator {
+    display: block;
+    padding: 0 0.2em 0.2em 0.2em;
+}
+.denominator {
+    border-top: 0.05em solid;
+    float: right;
+    width: 100%;
+    padding: 0.2em 0 0 0;
+}
+
+/** 上标下标 **/
+.supsub {
+    display: inline-block;
+    font-size: 90%;
+    text-align: center;
+    vertical-align: inherit;
+    position: relative;
+    top: -0.12em;
+    height: 1.66666em;
+}
+.supsub sup {
+    display: block;
+}
+.supsub sub {
+  float: left;
+  position: relative;
+  top: 1em;
+}
+.supsub sup + sub {
+  position: static;
+  vertical-align: middle;
+}
+
+/** 上划线 **/
+.bar {
+    display: inline-block;
+    line-height: 0.6em;
+    border-top: 0.05em solid;
+    margin-top: 1px;
+}
+
+/** 根号 **/
+.sqrt {
+    display: inline-block;
+}
+.sqrt .prefix {
+    display: inline-block;
+    position: relative;
+    top: 0.1em;
+    right: 0.05em;
+    vertical-align: top;
+}
+.sqrt .stem {
+    display: inline-block;
+    line-height: -0.6em;
+    position: relative;
+    left: -0.15em;
+    border-top: 0.05em solid;
+}
+
+/** 方程组 **/
+.multi-1 { height: 1em; line-height: 1; }
+.multi-2 { height: 2em; line-height: 2; }
+.multi-3 { height: 3em; line-height: 3; }
+.multi {
+    display: inline-block;
+}
+.multi-1 > .left-brac { transform: scale(1,1); }
+.multi-2 > .left-brac { transform: scale(1,2); }
+.multi-3 > .left-brac { transform: scale(1,3); }
+.multi-4 > .left-brac { transform: scale(1,4); }
+.multi-1 > .right-brac { transform: scale(1,1); }
+.multi-2 > .right-brac { transform: scale(1,2); }
+.multi-3 > .right-brac { transform: scale(1,3); }
+.multi-4 > .right-brac { transform: scale(1,4); }
+
+.multi > .left-brac,
+.multi > .right-brac {
+    display: inline-block;
+    line-height: 1;
+    position: relative;
+    top: -0.3em;
+}
+.multi > .content {
+    font-size: 70%;
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    top: -0.2em;
+}
+.multi > .content > .line {
+    display: block;
+    line-height: 1;
+    margin: 0.4em 0;
+}
+</style>
+</html>
