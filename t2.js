@@ -123,8 +123,8 @@
       return this;
     }
 
-    focus (DOM) {
-      if (this.cursor) {
+    focus () {
+      if (this.cursor && !this.cursor.currentSpace) {
         this.cursor.activate();
         const space = new Space(undefined, undefined, this.$root[0]);
         this.cursor.moveTo(space);
@@ -322,7 +322,12 @@
             console.log(this.parentElem);
             $(this.parentElem).addClass('empty');
           }
-          delete this.leftWord;
+          if (targetSpace.leftWord) {
+            this.leftWord = targetSpace.leftWord;
+          }
+          else {
+            delete this.leftWord;
+          }
         }
 
         targetWord.destroy();
