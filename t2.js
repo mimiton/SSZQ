@@ -310,7 +310,7 @@
       const targetWord = targetSpace.rightWord;
 
 //      console.log('targetWord:', targetWord);
-      if (targetWord) {
+      if (targetWord && targetWord === this.leftWord) {
         targetSpace.dettach();
 
         if (prevSpace && prevSpace.rightWord === targetSpace.leftWord) {
