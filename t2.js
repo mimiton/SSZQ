@@ -143,9 +143,27 @@
       this.blink = true;
 
       this.tmr = setInterval(() => {
-        this.syncCursorBlinkStatus();
-        this.blink = !this.blink;
+        this.toggle();
       }, duration || 450);
+    }
+
+    toggle () {
+      if (!this.isFrozen) {
+        this.blink = !this.blink;
+      }
+      this.syncCursorBlinkStatus();
+    }
+
+    freeze (duration) {
+      this.isFrozen = true;
+      if (this.freezeTmr) {
+        clearTimeout(this.freezeTmr);
+        delete this.freezeTmr;
+      }
+
+      this.freezeTmr = setTimeout(() => {
+        this.isFrozen = false;
+      }, duration || 400);
     }
 
     inactivate () {
@@ -184,8 +202,13 @@
     delete () {
       const $dom = this.$dom;
       $dom.remove();
-      this.currentSpace.deleteWord();
-      this.moveTo(this.currentSpace);
+      const deleteResult = this.currentSpace.deleteWord();
+      if (deleteResult === false) {
+        this.move(-1);
+      }
+      else {
+        this.moveTo(this.currentSpace);
+      }
     }
 
 
@@ -193,9 +216,12 @@
     moveTo (space) {
       const $dom = this.$dom;
       this.currentSpace = space;
-      console.log('cursor move to:', space);
+//      console.log('cursor move to:', space);
 
       space.putDOM($dom);
+
+      this.blink = true;
+      this.freeze();
     }
     moveUpDown (offset) {
     }
@@ -215,86 +241,97 @@
   }
 
   class Space {
-    constructor (prevElem, nextElem, parentElem) {
-      this.prevElem = prevElem;
-      this.nextElem = nextElem;
+    constructor (leftWord, rightWord, parentElem) {
+      if (leftWord) {
+        this.leftWord = leftWord;
+      }
+      if (rightWord) {
+        this.rightWord = rightWord;
+      }
       if (parentElem) {
         this.parentElem = parentElem;
       }
     }
 
     putDOM ($dom) {
-      const { prevElem, nextElem, parentElem } = this;
+      const { leftWord, rightWord, parentElem } = this;
 
       if (parentElem) {
         $(parentElem).append($dom);
       }
-      else if (prevElem) {
-        $(prevElem).after($dom);
+      else if (leftWord) {
+        leftWord.get$dom().after($dom);
       }
-      else if (nextElem) {
-        $(nextElem).before($dom);
+      else if (rightWord) {
+        rightWord.get$dom().before($dom);
       }
     }
 
     putWord (word) {
       const $dom = word.get$dom();
 
-      if (this.parentElem) {
-        $(this.parentElem).removeClass('empty');
-      }
       this.putDOM($dom);
 
-      this.afterToElem($dom[0]);
-      const space = new Space();
-      space.beforeToElem($dom[0]);
-      space.beforeTo(this);
+      if (this.parentElem) {
+        $(this.parentElem).removeClass('empty');
+        delete this.parentElem;
+      }
+      const newSpace = new Space();
+
+      if (this.leftWord) {
+        newSpace.leftWord = this.leftWord;
+      }
+      newSpace.beforeTo(this);
+      this.leftWord = word;
+      newSpace.rightWord = word;
+
       if (word.startSpace && word.endSpace) {
-        space.beforeTo(word.startSpace);
+        newSpace.beforeTo(word.startSpace);
         this.afterTo(word.endSpace);
       }
+
+
     }
 
     deleteWord () {
-      const middleSpace = this.prevSpace;
-      if (!middleSpace) {
+//      console.log(this);
+      if (!this.leftWord && !this.rightWord) {
+        const nextSpace = this.nextSpace;
+        this.dettach();
+        nextSpace.deleteWord();
+        return false;
+      }
+      const targetSpace = this.prevSpace;
+      if (!targetSpace) {
         return;
       }
 
-      const prevSpace = middleSpace.prevSpace;
-      const nextSpace = this;
-//      console.log('delete word:', middleSpace);
-      console.log(prevSpace, middleSpace, nextSpace);
+      const prevSpace = targetSpace.prevSpace;
+      const targetWord = targetSpace.rightWord;
 
-      if (!nextSpace.prevElem) {
-        return;
-      }
+//      console.log('targetWord:', targetWord);
+      if (targetWord) {
+        targetSpace.dettach();
 
-      $(middleSpace.nextElem).remove();
-      nextSpace.prevElem = nextSpace.nextElem ? nextSpace.nextElem.previousElementSibling : prevSpace.nextElem;
-      middleSpace.dettach();
-    }
+        if (prevSpace && prevSpace.rightWord === targetSpace.leftWord) {
+          this.leftWord = prevSpace.rightWord;
+        }
+        else {
+          if (!this.rightWord) {
+            this.parentElem = this.leftWord.get$dom().parent()[0];
+            console.log(this.parentElem);
+            $(this.parentElem).addClass('empty');
+          }
+          delete this.leftWord;
+        }
 
-    afterToElem (elem) {
-      delete this.parentElem;
-      this.prevElem = elem;
-      if (elem.nextElementSibling) {
-        this.nextElem = elem.nextElementSibling;
+        targetWord.destroy();
       }
       else {
-        delete this.nextElem;
+        return false;
       }
     }
-    beforeToElem (elem) {
-      delete this.parentElem;
-      this.nextElem = elem;
-      if (elem.previousElementSibling) {
-        this.prevElem = elem.previousElementSibling;
-      }
-      else {
-        delete this.prevElem;
-      }
-    }
+
     afterTo (space) {
       this.prevSpace = space;
       if (space.nextSpace) {
@@ -346,6 +383,10 @@
 
     get$dom () {
       return this.$dom;
+    }
+
+    destroy () {
+      this.$dom.remove();
     }
   }
 
