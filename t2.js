@@ -62,27 +62,33 @@
     }
 
     focus () {
-      if (this.cursor && !this.cursor.currentSpace) {
+      if (this.cursor) {
         this.cursor.activate();
-        const space = new Space(undefined, undefined, this.$root[0]);
-        this.cursor.moveTo(space);
+        if (!this.cursor.currentSpace) {
+          const space = new Space(undefined, undefined, this.$root[0]);
+          this.cursor.moveTo(space);
+        }
+      }
+    }
+
+    blur () {
+      if (this.cursor) {
+        this.cursor.inActivate();
       }
     }
   }
 
-  class Cursor {
+  class CursorInput {
     constructor () {
       const self = this;
-      this.$dom = $('<span class="cursor"></span>');
-      this.$input = $('<input class="cursor-input" type="text"/>');
-      $('body').append(this.$input);
+      this.$dom = $('<input class="cursor-input" type="text"/>');
+      $('body').append(this.$dom);
 
       let locked;
-      this.$input.on('compositionstart', function () {
-        console.log('lock')
+      this.$dom.on('compositionstart', function () {
         locked = true;
       });
-      this.$input[0].oninput = function () {
+      this.$dom.on('input', function () {
         if (locked) {
           if (!/\w+/.test(this.value)) {
             console.log(this.value);
@@ -91,60 +97,79 @@
         }
         if (!locked) {
           for (let i = 0; i < this.value.length; i++) {
-            self.input(new Word(this.value[i]));
+            if (self.handlerCursor) {
+              self.handlerCursor.input(new Word(this.value[i]));
+            }
           }
           this.value = '';
         }
-      };
-      this.$input[0].addEventListener('keydown', (e) => {
-//        console.log(e);
-        let stop;
+      });
+      this.$dom.on('keydown', (e) => {
+        let stop = true;
         const code = e.keyCode;
         if (code === 54 && e.shiftKey) {
-          stop = true;
-          this.input(new WordSupSub(true));
+          this.handlerCursor.input(new WordSupSub(true));
         }
         else if (code === 189 && e.shiftKey) {
-          stop = true;
-          this.input(new WordSupSub(false, true));
+          this.handlerCursor.input(new WordSupSub(false, true));
         }
         else if (code === Cursor.KEY_LEFT) {
-          stop = true;
-          this.move(-1);
+          this.handlerCursor.move(-1);
         }
         else if (code === Cursor.KEY_RIGHT) {
-          stop = true;
-          this.move(1);
+          this.handlerCursor.move(1);
         }
         else if (code === Cursor.KEY_UP) {
-          stop = true;
 
         }
         else if (code === Cursor.KEY_DOWN) {
-          stop = true;
 
         }
         else if (code === Cursor.KEY_BACKSPACE) {
-          stop = true;
-          this.delete();
+          this.handlerCursor.delete();
+        }
+        else {
+          stop = false;
         }
 
         if (stop) {
           e.stopPropagation();
           e.preventDefault();
         }
-
       });
     }
 
+    focus (offset) {
+      if (document.activeElement !== this.$dom[0]) {
+        this.$dom.focus();
+      }
+
+      if (offset) {
+        this.$dom.css('left', offset.left + 20).css('top', offset.top);
+      }
+    }
+
+    mountToCursor (cursor) {
+      this.handlerCursor = cursor;
+    }
+  }
+
+  class Cursor {
+    constructor () {
+      this.$dom = $('<span class="cursor"></span>');
+      this.cursorInput = new CursorInput();
+      this.cursorInput.mountToCursor(this);
+    }
+
     activate (duration) {
-      this.inactivate();
+      this.inActivate();
 
       this.blink = true;
 
       this.tmr = setInterval(() => {
         this.toggle();
       }, duration || 450);
+      this.toggle();
     }
 
     toggle () {
@@ -166,7 +191,7 @@
       }, duration || 400);
     }
 
-    inactivate () {
+    inActivate () {
       if (this.tmr) {
         clearInterval(this.tmr);
         delete this.tmr;
@@ -180,12 +205,11 @@
     }
 
     syncCursorBlinkStatus () {
-      if (document.activeElement !== this.$input[0]) {
-        this.$input.focus();
-      }
       const offset = this.$dom.offset();
-      this.$input.css('left', offset.left).css('top', offset.top);
       this.$dom[(this.blink ? 'add' : 'remove') + 'Class']('blink');
+      if (this.isActive()) {
+        this.cursorInput.focus(offset);
+      }
     }
 
     get$DOM () {
@@ -194,8 +218,6 @@
 
     input (word) {
       const $dom = this.$dom;
-      const word$dom = word.get$dom();
-
 
       $dom.remove();
       this.currentSpace.putWord(word);
@@ -208,15 +230,11 @@
       const $dom = this.$dom;
       $dom.remove();
       const deleteResult = this.currentSpace.deleteWord();
-      if (deleteResult === false) {
-        this.move(-1);
-      }
-      else {
-        this.moveTo(this.currentSpace);
-      }
+      this.moveTo(deleteResult);
     }
 
     moveTo (space) {
+//      print(space);
       const $dom = this.$dom;
       this.currentSpace = space;
 //      console.log('cursor move to:', space);
@@ -305,13 +323,15 @@
 //      console.log(this);
       if (!this.leftWord && !this.rightWord) {
         const nextSpace = this.nextSpace;
-        this.dettach();
-        nextSpace.deleteWord();
-        return false;
+        if (nextSpace) {
+          this.dettach();
+          nextSpace.deleteWord();
+        }
+        return nextSpace;
       }
       const targetSpace = this.prevSpace;
       if (!targetSpace) {
-        return;
+        return this;
       }
 
       const prevSpace = targetSpace.prevSpace;
@@ -341,8 +361,10 @@
         targetWord.destroy();
       }
       else {
-        return false;
+        return this.prevSpace;
       }
+
+      return this;
     }
 
     afterTo (space) {
@@ -387,7 +409,7 @@
       if (!text) {
         return;
       }
-      this.init$dom('<span sel_word>' + text + '</span>');
+      this.init$dom('<span sel_word>' + text.replace(/\s/, '&nbsp;') + '</span>');
     }
 
     init$dom (html) {
@@ -455,4 +477,29 @@
   }
 
   global.SSZQ = SSZQ;
+
+  function print (space) {
+    let curSpace = space;
+    while (curSpace.prevSpace) {
+      curSpace = curSpace.prevSpace;
+    }
+
+    const data = [];
+
+    do {
+      const obj = {
+        curSpace,
+        leftElem: curSpace.leftWord && curSpace.leftWord.$dom[0],
+        rightElem: curSpace.rightWord && curSpace.rightWord.$dom[0]
+      };
+
+      if (curSpace === space) {
+        obj.current = true;
+      }
+      data.push(obj);
+      curSpace = curSpace.nextSpace;
+    } while (curSpace);
+
+    console.log(data);
+  }
 })(window);
