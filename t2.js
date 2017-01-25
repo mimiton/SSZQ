@@ -1,71 +1,9 @@
 ;(function(global) {
-  class GlobalKeyEventListener {
-    constructor () {
-      const self = this;
-      this.handlers = [];
-
-      document.addEventListener('keydown', (e) => {
-//        console.log(e);
-        let command;
-        const code = e.keyCode;
-        if (code >= 65 && code < 65 + 26) {
-          command = e.key;
-        }
-        else if (code === 54 && e.shiftKey) {
-          command = '^^';
-        }
-        else if (code === 189 && e.shiftKey) {
-          command = '__';
-        }
-        else if (code === GlobalKeyEventListener.KEY_LEFT) {
-          command = '<=';
-        }
-        else if (code === GlobalKeyEventListener.KEY_RIGHT) {
-          command = '=>';
-        }
-        else if (code === GlobalKeyEventListener.KEY_UP) {
-          command = '^=';
-        }
-        else if (code === GlobalKeyEventListener.KEY_DOWN) {
-          command = '_=';
-        }
-        else if (code === GlobalKeyEventListener.KEY_BACKSPACE) {
-          command = '<<';
-        }
-
-        if (!command) {
-          return;
-        }
-
-        const handlers = this.handlers;
-
-        if (handlers && handlers.length > 0) {
-          handlers.forEach((handler) => {
-            handler.command(command);
-          });
-        }
-      });
-    }
-
-    registerHandler (handler) {
-      this.handlers.push(handler);
-    }
-  }
-  GlobalKeyEventListener.KEY_LEFT = 37;
-  GlobalKeyEventListener.KEY_UP = 38;
-  GlobalKeyEventListener.KEY_RIGHT = 39;
-  GlobalKeyEventListener.KEY_DOWN = 40;
-  GlobalKeyEventListener.KEY_BACKSPACE = 8;
-
-  const keyListener = new GlobalKeyEventListener();
-
   class SSZQ {
     constructor(target) {
       this.$dom = $(target);
 
       this.init();
-
-      keyListener.registerHandler(this);
     }
 
     init () {
@@ -134,7 +72,69 @@
 
   class Cursor {
     constructor () {
+      const self = this;
       this.$dom = $('<span class="cursor"></span>');
+      this.$input = $('<input class="cursor-input" type="text"/>');
+      $('body').append(this.$input);
+
+      let locked;
+      this.$input.on('compositionstart', function () {
+        console.log('lock')
+        locked = true;
+      });
+      this.$input[0].oninput = function () {
+        if (locked) {
+          if (!/\w+/.test(this.value)) {
+            console.log(this.value);
+            locked = false;
+          }
+        }
+        if (!locked) {
+          for (let i = 0; i < this.value.length; i++) {
+            self.input(new Word(this.value[i]));
+          }
+          this.value = '';
+        }
+      };
+      this.$input[0].addEventListener('keydown', (e) => {
+//        console.log(e);
+        let stop;
+        const code = e.keyCode;
+        if (code === 54 && e.shiftKey) {
+          stop = true;
+          this.input(new WordSupSub(true));
+        }
+        else if (code === 189 && e.shiftKey) {
+          stop = true;
+          this.input(new WordSupSub(false, true));
+        }
+        else if (code === Cursor.KEY_LEFT) {
+          stop = true;
+          this.move(-1);
+        }
+        else if (code === Cursor.KEY_RIGHT) {
+          stop = true;
+          this.move(1);
+        }
+        else if (code === Cursor.KEY_UP) {
+          stop = true;
+
+        }
+        else if (code === Cursor.KEY_DOWN) {
+          stop = true;
+
+        }
+        else if (code === Cursor.KEY_BACKSPACE) {
+          stop = true;
+          this.delete();
+        }
+
+        if (stop) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+
+      });
     }
 
     activate (duration) {
@@ -180,6 +180,11 @@
     }
 
     syncCursorBlinkStatus () {
+      if (document.activeElement !== this.$input[0]) {
+        this.$input.focus();
+      }
+      const offset = this.$dom.offset();
+      this.$input.css('left', offset.left).css('top', offset.top);
       this.$dom[(this.blink ? 'add' : 'remove') + 'Class']('blink');
     }
 
@@ -211,8 +216,6 @@
       }
     }
 
-
-
     moveTo (space) {
       const $dom = this.$dom;
       this.currentSpace = space;
@@ -239,6 +242,11 @@
       this.moveTo(this.currentSpace);
     }
   }
+  Cursor.KEY_LEFT = 37;
+  Cursor.KEY_UP = 38;
+  Cursor.KEY_RIGHT = 39;
+  Cursor.KEY_DOWN = 40;
+  Cursor.KEY_BACKSPACE = 8;
 
   class Space {
     constructor (leftWord, rightWord, parentElem) {
