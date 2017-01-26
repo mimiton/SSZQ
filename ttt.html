@@ -108,8 +108,13 @@
         </span>
     </div>
 </body>
-<script type="text/javascript" src="S.js"></script>
-<script type="text/javascript" src="t2.js"></script>
+<script type="text/javascript" src="./src/JQLib/S.js"></script>
+<script type="text/javascript" src="./src/SSZQ.js"></script>
+<script type="text/javascript" src="./src/cursor/CursorInput.js"></script>
+<script type="text/javascript" src="./src/cursor/Cursor.js"></script>
+<script type="text/javascript" src="./src/space/Space.js"></script>
+<script type="text/javascript" src="./src/word/Word.js"></script>
+<script type="text/javascript" src="./src/word/WordSupSub.js"></script>
 <script>
 //const html = $('#ttt').children('.root').html().replace(/\n\s+/g, '');
 $('#ttt').children('.root').html('');
@@ -124,9 +129,8 @@ $(document).on('click', (e) => {
     sszq.blur();
   }
 });
-//sszq.command('A').command('B');
+sszq.command('A').command('B');
 
-//  new SSZQ(document.getElementById('ttt') ,'ab^{2}+\\times\\div b_{g^{3}}−\\frac{\\frac{a}{b}}{\\frac{x}{y}}+x^{a}_{b}\\bar{a}\\sqrt{abc}\\begin{cases}line1\\\\line2\\\\line3\\\\line4\\end{cases}\\begin{cases}line1\\\\line2\\\\line3\\\\line4\\end{cases}');
 </script>
 <style>
 #ttt {
