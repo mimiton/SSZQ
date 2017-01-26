@@ -10,7 +10,7 @@ class CursorInput {
     });
     this.$dom.on('input', function () {
       if (locked) {
-        if (!/\w+/.test(this.value)) {
+        if (!/^\w$|^\w[\w\']+$/.test(this.value)) {
           locked = false;
         }
       }
@@ -26,26 +26,30 @@ class CursorInput {
     this.$dom.on('keydown', (e) => {
       let stop = true;
       const code = e.keyCode;
+//      console.log(code);
       if (code === 54 && e.shiftKey) {
         this.handlerCursor.command('^^');
       }
       else if (code === 189 && e.shiftKey) {
         this.handlerCursor.command('__');
       }
-      else if (code === Cursor.KEY_LEFT) {
+      else if (code === CursorInput.KEY_LEFT) {
         this.handlerCursor.command('<=');
       }
-      else if (code === Cursor.KEY_RIGHT) {
+      else if (code === CursorInput.KEY_RIGHT) {
         this.handlerCursor.command('=>');
       }
-      else if (code === Cursor.KEY_UP) {
+      else if (code === CursorInput.KEY_UP) {
 
       }
-      else if (code === Cursor.KEY_DOWN) {
+      else if (code === CursorInput.KEY_DOWN) {
 
       }
-      else if (code === Cursor.KEY_BACKSPACE) {
+      else if (code === CursorInput.KEY_BACKSPACE) {
         this.handlerCursor.command('<<');
+      }
+      else if (code === CursorInput.KEY_ENTER) {
+        this.handlerCursor.command('<_|');
       }
       else {
         stop = false;
@@ -72,3 +76,9 @@ class CursorInput {
     this.handlerCursor = cursor;
   }
 }
+CursorInput.KEY_LEFT = 37;
+CursorInput.KEY_UP = 38;
+CursorInput.KEY_RIGHT = 39;
+CursorInput.KEY_DOWN = 40;
+CursorInput.KEY_BACKSPACE = 8;
+CursorInput.KEY_ENTER = 13;

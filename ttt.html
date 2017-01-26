@@ -6,7 +6,7 @@
 </head>
 <body>
     <div id="ttt" class="ssz-field">
-        <span sel_root class="root">
+        <span class="root">
             <var sel_word>a</var>
             <var sel_word>b</var>
             <span sel_leaf class="supsub">
@@ -107,6 +107,7 @@
             </span>
         </span>
     </div>
+    <button id="btn">GO</button>
 </body>
 <script type="text/javascript" src="./src/JQLib/S.js"></script>
 <script type="text/javascript" src="./src/SSZQ.js"></script>
@@ -115,6 +116,7 @@
 <script type="text/javascript" src="./src/space/Space.js"></script>
 <script type="text/javascript" src="./src/word/Word.js"></script>
 <script type="text/javascript" src="./src/word/WordSupSub.js"></script>
+<script type="text/javascript" src="./src/word/WordBreak.js"></script>
 <script>
 //const html = $('#ttt').children('.root').html().replace(/\n\s+/g, '');
 $('#ttt').children('.root').html('');
@@ -129,7 +131,64 @@ $(document).on('click', (e) => {
     sszq.blur();
   }
 });
-sszq.command('A').command('B');
+
+const words = [
+  '一',
+  '个',
+  '厉',
+  '害',
+  '<<',
+  '<<',
+  '牛',
+  '逼',
+  '的',
+  '数',
+  '学',
+  '题',
+  '目',
+  '编',
+  '辑',
+  '器',
+  '，',
+  '1',
+  '2',
+  '3',
+  '4',
+  '<<',
+  '<<',
+  '^^',
+  '2',
+  'b',
+  '^^',
+  '2',
+  'a',
+  '=>',
+  '=>',
+  '哈',
+  '哈',
+  '哈',
+  '哈',
+  '5',
+  '6',
+  '7',
+  '8',
+  '__',
+  '2',
+  'X'
+];
+$('#btn').on('click', function start(e) {
+  sszq.focus();
+  e.stopPropagation();
+  const tmr = setInterval(() => {
+    const word = words.shift();
+    if (word) {
+      sszq.command(word);
+    }
+    else {
+      clearInterval(tmr);
+    }
+  }, 200);
+});
 
 </script>
 <style>

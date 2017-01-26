@@ -96,7 +96,7 @@ var commonFuncs = {
         var container = DOC.createElement('div');
 
         // 严格模式，且传入字符不符合HTML特征，所以返回空的元素集合
-        if( strict && !/<\w.*?>/.test(str) )
+        if( strict && !/<[\w\/].*?>/.test(str) )
             return container.childNodes;
 
         var wrapMap = {

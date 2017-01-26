@@ -15,7 +15,7 @@ class SSZQ {
     this.$root = $root;
 
     $root.on('click', (e) => {
-      this.focus(e.target);
+      this.focus();
     });
   }
 

@@ -127,13 +127,11 @@ class Cursor {
     else if (command === '<<') {
       this.delete();
     }
+    else if (command === '<_|') {
+      this.input(new WordBreak());
+    }
     else {
       this.input(new Word(command));
     }
   }
 }
-Cursor.KEY_LEFT = 37;
-Cursor.KEY_UP = 38;
-Cursor.KEY_RIGHT = 39;
-Cursor.KEY_DOWN = 40;
-Cursor.KEY_BACKSPACE = 8;
