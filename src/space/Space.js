@@ -30,10 +30,8 @@ class Space {
 
     this.putDOM($dom);
 
-    if (this.parentElem) {
-      $(this.parentElem).removeClass('empty');
-      delete this.parentElem;
-    }
+
+    this._removeEmpty();
     const newSpace = new Space();
 
     if (this.leftWord) {
@@ -59,6 +57,9 @@ class Space {
     if (!this.leftWord && !this.rightWord) {
       const nextSpace = this.nextSpace;
       if (nextSpace) {
+        if (this.parentElem) {
+          $(this.parentElem).remove();
+        }
         this.dettach();
         nextSpace.deleteWord();
         return nextSpace;
@@ -76,7 +77,7 @@ class Space {
     if (targetWord && targetWord === this.leftWord) {
       targetSpace.dettach();
 
-      if (prevSpace && prevSpace.rightWord === targetSpace.leftWord) {
+      if (prevSpace && prevSpace.rightWord && prevSpace.rightWord === targetSpace.leftWord) {
         prevSpace.rightWord.attachToRightSpace(this);
       }
       else {
@@ -100,6 +101,13 @@ class Space {
     }
 
     return this;
+  }
+
+  _removeEmpty () {
+    if (this.parentElem) {
+      $(this.parentElem).removeClass('empty');
+      delete this.parentElem;
+    }
   }
 
   afterTo (space) {

@@ -108,11 +108,28 @@ class Cursor {
   }
 
   command (command) {
+    const currentSpace = this.currentSpace;
+    if (!currentSpace) {
+      return;
+    }
+
     if (command === '^^') {
-      this.input(new WordSupSub(true));
+      if (currentSpace.rightWord && currentSpace.rightWord instanceof WordSupSub) {
+        currentSpace.rightWord.addSupWord(true);
+        this.moveTo(currentSpace.rightWord.startSpace);
+      }
+      else {
+        this.input(new WordSupSub(true));
+      }
     }
     else if (command === '__') {
-      this.input(new WordSupSub(false, true));
+      if (currentSpace.rightWord && currentSpace.rightWord instanceof WordSupSub) {
+        currentSpace.rightWord.addSubWord(true);
+        this.moveTo(currentSpace.rightWord.endSpace);
+      }
+      else {
+        this.input(new WordSupSub(false, true));
+      }
     }
     else if (command === '<=') {
       this.move(-1);
@@ -129,6 +146,9 @@ class Cursor {
     }
     else if (command === '<_|') {
       this.input(new WordBreak());
+    }
+    else if (command === '\\sqrt') {
+      this.input(new WordSqrt());
     }
     else {
       this.input(new Word(command));
