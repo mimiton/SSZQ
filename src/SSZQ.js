@@ -6,6 +6,7 @@ class SSZQ {
   }
 
   init () {
+    this.$dom.attr('sel-field', '');
     let $root = this.$dom.children('.root');
     if ($root.length < 1) {
       this.$dom.append('<span class="root"></span>');
@@ -14,8 +15,16 @@ class SSZQ {
 
     this.$root = $root;
 
-    $root.on('click', (e) => {
+    this.$dom.on('click', (e) => {
       this.focus();
+    });
+
+
+    $(document).on('click', (e) => {
+      const $root = $(e.target).parent('[sel-field]');
+      if (!$.match(e.target, '[sel-field]') && $root.length < 1) {
+        this.blur();
+      }
     });
   }
 
@@ -50,6 +59,15 @@ class SSZQ {
     if (this.cursor) {
       this.cursor.inActivate();
     }
+  }
+
+  mountKeyboard (DOMSelector) {
+    this.$keyboard = $(DOMSelector);
+    this.$keyboard.delegate('[attr-cmd]', 'click', (e) => {
+      const command = $(e.target).attr('attr-cmd');
+      this.command(command);
+      e.stopPropagation();
+    });
   }
 }
 

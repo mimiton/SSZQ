@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
     <div id="ttt" class="ssz-field">
@@ -107,7 +108,18 @@
             </span>
         </span>
     </div>
-    <button id="btn">GO</button>
+    <div id="kbd">
+      <button attr-cmd="^^">sup</button>
+      <button attr-cmd="__">sub</button>
+      <button attr-cmd="\sqrt">\sqrt</button>
+      <button attr-cmd="\frac">\frac</button>
+      <button attr-cmd="\bar">\bar</button>
+      <button attr-cmd="\sum">\sum</button>
+      <button attr-cmd="\log">\log</button>
+      <button attr-cmd="\ln">\ln</button>
+      <button attr-cmd="\int">\int</button>
+      <button attr-cmd="\oint">\oint</button>
+    </div>
 </body>
 <script type="text/javascript" src="./src/JQLib/S.js"></script>
 <script type="text/javascript" src="./src/SSZQ.js"></script>
@@ -117,6 +129,9 @@
 <script type="text/javascript" src="./src/word/Word.js"></script>
 <script type="text/javascript" src="./src/word/WordSupSub.js"></script>
 <script type="text/javascript" src="./src/word/WordSqrt.js"></script>
+<script type="text/javascript" src="./src/word/WordFrac.js"></script>
+<script type="text/javascript" src="./src/word/WordBar.js"></script>
+<script type="text/javascript" src="./src/word/WordPrefix.js"></script>
 <script type="text/javascript" src="./src/word/WordBreak.js"></script>
 <script>
 //const html = $('#ttt').children('.root').html().replace(/\n\s+/g, '');
@@ -125,229 +140,13 @@ $('#ttt').children('.root').html('');
 const sszq = new SSZQ(document.getElementById('ttt'));
 sszq.editable();
 sszq.focus();
+sszq.mountKeyboard('#kbd')
 
-$(document).on('click', (e) => {
-  const $root = $(e.target).parent('[sel_root]');
-  if (!$.match(e.target, '[sel_root]') && $root.length < 1) {
-    sszq.blur();
-  }
-});
-
-const words = [
-    '\\sqrt'
-];
-const _words = [
-  '一',
-  '个',
-  '厉',
-  '害',
-  '<<',
-  '<<',
-  '牛',
-  '逼',
-  '的',
-  '数',
-  '学',
-  '题',
-  '目',
-  '编',
-  '辑',
-  '器',
-  '，',
-  '1',
-  '2',
-  '3',
-  '4',
-  '<<',
-  '<<',
-  '^^',
-  '2',
-  'b',
-  '^^',
-  '2',
-  'a',
-  '=>',
-  '=>',
-  '哈',
-  '哈',
-  '哈',
-  '哈',
-  '5',
-  '6',
-  '7',
-  '8',
-  '__',
-  '2',
-  'X'
-];
-$('#btn').on('click', function start(e) {
-  sszq.focus();
-  e.stopPropagation();
-  const tmr = setInterval(() => {
-    const word = words.shift();
-    if (word) {
-      sszq.command(word);
-    }
-    else {
-      clearInterval(tmr);
-    }
-  }, 200);
-});
 
 </script>
 <style>
 #ttt {
   border: 1px solid;
-}
-.ssz-field {
-  cursor: text;
-  display: inline-block;
-  padding: 4px;
-  font-family: Symbola, "Times New Roman", serif;
-  font-size: 28px;
-}
-.ssz-field * {
-  box-sizing: border-box;
-  vertical-align: middle;
-}
-.root {
-  display: inline-block;
-  letter-spacing: 0.06em;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-  vertical-align: middle;
-  padding: 10px;
-}
-
-.root .empty:after {
-  content: 'c';
-  visibility: hidden;
-}
-.root .empty {
-  background: #ccc;
-}
-
-.cursor {
-  position: relative;
-  z-index: 10;
-  margin-left: -1px;
-  border-left: 1px solid transparent;
-}
-.cursor.blink {
-  border-left: 1px solid;
-}
-.cursor-input {
-  position: absolute;
-  z-index: -10;
-  width: 20px;
-  opacity: 0;
-}
-
-/** 分数 **/
-.fraction {
-    display: inline-block;
-    font-size: 90%;
-    text-align: center;
-    vertical-align: inherit;
-    position: relative;
-    top: -0.12em;
-}
-.numerator {
-    display: block;
-    padding: 0 0.2em 0.2em 0.2em;
-}
-.denominator {
-    border-top: 0.05em solid;
-    float: right;
-    width: 100%;
-    padding: 0.2em 0 0 0;
-}
-
-/** 上标下标 **/
-.supsub {
-  display: inline-block;
-  font-size: 90%;
-}
-.supsub.has-sup {
-  vertical-align: 0.5em;
-}
-.supsub.has-sub {
-  vertical-align: -0.7em;
-}
-.supsub > * {
-  text-align: left;
-}
-.supsub sup {
-  display: block;
-}
-.supsub sub {
-  display: inline-block;
-  float: left;
-}
-
-/** 上划线 **/
-.bar {
-    display: inline-block;
-    line-height: 0.6em;
-    border-top: 0.05em solid;
-    margin-top: 1px;
-}
-
-/** 根号 **/
-.sqrt {
-    display: inline-block;
-}
-.sqrt .prefix {
-  transform-origin: top;
-  font: 1em/0.875 Symbola, serif;
-  display: inline-block;
-  position: relative;
-  top: 0em;
-  right: 0.09em;
-  vertical-align: top;
-}
-.sqrt .stem {
-  display: inline-block;
-  position: relative;
-  left: -0.15em;
-  border-top: 0.05em solid;
-}
-
-/** 方程组 **/
-.multi-1 { height: 1em; line-height: 1; }
-.multi-2 { height: 2em; line-height: 2; }
-.multi-3 { height: 3em; line-height: 3; }
-.multi {
-    display: inline-block;
-}
-.multi-1 > .left-brac { transform: scale(1,1); }
-.multi-2 > .left-brac { transform: scale(1,2); }
-.multi-3 > .left-brac { transform: scale(1,3); }
-.multi-4 > .left-brac { transform: scale(1,4); }
-.multi-1 > .right-brac { transform: scale(1,1); }
-.multi-2 > .right-brac { transform: scale(1,2); }
-.multi-3 > .right-brac { transform: scale(1,3); }
-.multi-4 > .right-brac { transform: scale(1,4); }
-
-.multi > .left-brac,
-.multi > .right-brac {
-    display: inline-block;
-    line-height: 1;
-    position: relative;
-    top: -0.3em;
-}
-.multi > .content {
-    font-size: 70%;
-    display: inline-block;
-    vertical-align: middle;
-    position: relative;
-    top: -0.2em;
-}
-.multi > .content > .line {
-    display: block;
-    line-height: 1;
-    margin: 0.4em 0;
 }
 </style>
 </html>

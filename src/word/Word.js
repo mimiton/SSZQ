@@ -1,9 +1,18 @@
 class Word {
-  constructor (text) {
+  constructor (text, extraClass) {
     if (!text) {
       return;
     }
-    this.init$dom('<span>' + text.replace(/\s/, '&nbsp;') + '</span>');
+
+    let tag;
+
+    if (/[A-Za-z]/.test(text)) {
+      tag = 'var';
+    }
+    else {
+      tag = 'span';
+    }
+    this.init$dom('<' + tag + (extraClass ? ' class="' + extraClass + '"': '') + '>' + text.replace(/\s/, '&nbsp;') + '</' + tag + '>');
   }
 
   init$dom (html) {

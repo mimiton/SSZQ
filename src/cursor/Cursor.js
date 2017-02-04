@@ -150,6 +150,27 @@ class Cursor {
     else if (command === '\\sqrt') {
       this.input(new WordSqrt());
     }
+    else if (command === '\\frac') {
+      this.input(new WordFrac());
+    }
+    else if (command === '\\bar') {
+      this.input(new WordBar());
+    }
+    else if (command === '\\sum') {
+      this.input(new WordPrefix('∑'));
+    }
+    else if (command === '\\log') {
+      this.input(new WordPrefix('log'));
+    }
+    else if (command === '\\ln') {
+      this.input(new WordPrefix('ln'));
+    }
+    else if (command === '\\int') {
+      this.input(new Word('∫', 'int'));
+    }
+    else if (command === '\\oint') {
+      this.input(new Word('∮'));
+    }
     else {
       this.input(new Word(command));
     }
