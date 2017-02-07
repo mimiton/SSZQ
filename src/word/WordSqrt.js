@@ -21,7 +21,7 @@ class WordSqrt extends Word {
     $stem.on('DOMSubtreeModified', (e) => {
       const stemHeight = $stem.height();
       const height = $prefix.height();
-      $prefix.css('transform', 'scale(1,' + (stemHeight/height - 0.2) + ')')
+      $prefix.css('transform', 'scale(1,' + (stemHeight/height - 0.1) + ')')
     })
   }
 }

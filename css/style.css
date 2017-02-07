@@ -8,7 +8,6 @@
 }
 .ssz-field * {
     box-sizing: border-box;
-    vertical-align: middle;
 }
 .root {
     display: inline-block;
@@ -28,6 +27,7 @@
 }
 
 .cursor {
+    line-height: 1;
     position: relative;
     z-index: 10;
     margin-left: -1px;
@@ -60,7 +60,11 @@
     border-top: 0.05em solid;
     float: right;
     width: 100%;
-    padding: 0;
+    padding: 0.1em;
+}
+.numerator > span,
+.denominator > span {
+    display: inline-block;
 }
 
 /** 上标下标 **/
