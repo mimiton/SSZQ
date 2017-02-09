@@ -226,4 +226,21 @@ class Space {
       }
     }
   }
+
+  getParentWord () {
+    let firstSpace = this.prevSpace;
+    let secondSpace = this;
+    while (1) {
+      if (firstSpace) {
+        if (firstSpace.rightWord && !secondSpace.leftWord) {
+          return firstSpace.rightWord;
+        }
+      }
+      else {
+        break;
+      }
+      secondSpace = firstSpace;
+      firstSpace = firstSpace.prevSpace;
+    }
+  }
 }

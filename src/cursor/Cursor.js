@@ -142,7 +142,30 @@ class Cursor {
       return;
     }
 
-    if (command === '^^') {
+
+    if (command === '<=') {
+      this.move(-1);
+    }
+    else if (command === '=>') {
+      this.move(1);
+    }
+    else if (command === '^=') {
+    }
+    else if (command === '_=') {
+    }
+    else if (command === '<<') {
+      this.delete();
+    }
+    else if (command === '<_|') {
+      const parentWord = this.currentSpace.getParentWord();
+      if (parentWord instanceof WordManualInput) {
+        parentWord.enter();
+      }
+      else {
+        this.input(new WordBreak());
+      }
+    }
+    else if (command === '^^') {
       const rightWord = currentSpace.rightWord;
       const rightRightWord = rightWord && rightWord.rightSpace && rightWord.rightSpace.rightWord;
       if (rightWord instanceof WordSup) {
@@ -168,22 +191,6 @@ class Cursor {
       }
       this.input(new WordSub(true));
     }
-    else if (command === '<=') {
-      this.move(-1);
-    }
-    else if (command === '=>') {
-      this.move(1);
-    }
-    else if (command === '^=') {
-    }
-    else if (command === '_=') {
-    }
-    else if (command === '<<') {
-      this.delete();
-    }
-    else if (command === '<_|') {
-      this.input(new WordBreak());
-    }
     else if (command === '\\sqrt') {
       this.input(new WordSqrt());
     }
@@ -208,8 +215,22 @@ class Cursor {
     else if (command === '\\oint') {
       this.input(new Word('∮'));
     }
+    else if (command === '\\cases') {
+      this.input(new WordMultiLine());
+    }
+    else if (command === '@__@') {
+      const parentWord = this.currentSpace.getParentWord();
+      if (parentWord instanceof WordManualInput) {
+        this.input(new Word('\\'));
+      }
+      else {
+        this.input(new WordManualInput());
+      }
+    }
     else {
-      this.input(new Word(command));
+      for (let i = 0; i < command.length; i++) {
+        this.input(new Word(command[i]));
+      }
     }
   }
 }

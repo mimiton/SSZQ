@@ -15,10 +15,8 @@ class CursorInput {
         }
       }
       if (!locked) {
-        for (let i = 0; i < this.value.length; i++) {
-          if (self.handlerCursor) {
-            self.handlerCursor.command(this.value[i]);
-          }
+        if (self.handlerCursor) {
+          self.handlerCursor.command(this.value);
         }
         this.value = '';
       }
@@ -35,6 +33,9 @@ class CursorInput {
       }
       else if (code === 191) {
         this.handlerCursor.command('\\frac');
+      }
+      else if (code === 220) {
+        this.handlerCursor.command('@__@');
       }
       else if (code === CursorInput.KEY_LEFT) {
         this.handlerCursor.command('<=');
