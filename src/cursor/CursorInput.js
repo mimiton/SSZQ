@@ -33,6 +33,9 @@ class CursorInput {
       else if (code === 189 && e.shiftKey) {
         this.handlerCursor.command('__');
       }
+      else if (code === 191) {
+        this.handlerCursor.command('\\frac');
+      }
       else if (code === CursorInput.KEY_LEFT) {
         this.handlerCursor.command('<=');
       }

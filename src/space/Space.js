@@ -94,6 +94,49 @@ class Space {
   }
 
   deleteWord () {
+    if (!this.leftWord && !this.rightWord) {
+      const nextSpace = this.nextSpace;
+      if (nextSpace && !$(this.parentElem).hasAttr('attr-disable_delete')) {
+        this.dettach();
+        return nextSpace.deleteWord();
+      }
+      else if (this.prevSpace && this.prevSpace.rightWord && this.prevSpace.rightWord.rightSpace) {
+        return this.prevSpace.rightWord.rightSpace.deleteWord();
+      }
+    }
+    else if (this.leftWord) {
+      const leftWord = this.leftWord;
+      const rightWord = this.rightWord;
+      const targetSpace = leftWord.leftSpace;
+
+      leftWord.dettachFromLeftSpace();
+      if (rightWord) {
+        rightWord.attachToLeftSpace(targetSpace);
+      }
+
+      let currentSpace = this;
+      let nextSpace;
+      do {
+        nextSpace = currentSpace.prevSpace;
+        currentSpace.dettach();
+        currentSpace = nextSpace;
+      } while(currentSpace !== targetSpace);
+
+      if (!targetSpace.leftWord && !targetSpace.rightWord) {
+        const $parent = leftWord.get$dom().parent();
+        $parent.addClass('empty');
+        targetSpace.parentElem = $parent[0];
+      }
+
+      leftWord.destroy();
+
+      return targetSpace;
+    }
+
+    return this;
+  }
+
+  _deleteWord () {
 //    console.log(this);
     if (!this.leftWord && !this.rightWord) {
       const nextSpace = this.nextSpace;
