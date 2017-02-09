@@ -98,9 +98,6 @@ class Space {
     if (!this.leftWord && !this.rightWord) {
       const nextSpace = this.nextSpace;
       if (nextSpace) {
-        if (this.parentElem) {
-          $(this.parentElem).remove();
-        }
         this.dettach();
         nextSpace.deleteWord();
         return nextSpace;

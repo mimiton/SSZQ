@@ -45,4 +45,17 @@ class WordSup extends Word {
         break;
     }
   }
+
+  destroy () {
+    const $parent = this.get$dom().parent();
+
+    super.destroy();
+
+    if ($parent.children().length > 0) {
+      $parent.addClass('sub-only');
+    }
+    else {
+      $parent.remove();
+    }
+  }
 }

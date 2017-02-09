@@ -3,7 +3,7 @@ class WordFrac extends Word {
     super();
     let html = '<span class="fraction">' +
       '<span class="numerator"></span>' +
-      '<span attr-disable_delete class="denominator"></span>' +
+      '<span class="denominator"></span>' +
       '</span>';
     this.init$dom(html);
 
@@ -23,7 +23,7 @@ class WordFrac extends Word {
 
     let $numerator;
     let space;
-    $numerator = $('<span></span>');
+    $numerator = $('<span attr-disable_delete></span>');
     $dom.children('.numerator').prepend($numerator);
 
     $numerator.addClass('empty');
@@ -42,7 +42,7 @@ class WordFrac extends Word {
 
     let $denominator;
     let space;
-    $denominator = $('<span></span>');
+    $denominator = $('<span attr-disable_delete></span>');
     $dom.children('.denominator').append($denominator);
 
     $denominator.addClass('empty');
