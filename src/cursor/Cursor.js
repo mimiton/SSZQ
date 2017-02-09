@@ -165,72 +165,125 @@ class Cursor {
         this.input(new WordBreak());
       }
     }
-    else if (command === '^^') {
-      const rightWord = currentSpace.rightWord;
-      const rightRightWord = rightWord && rightWord.rightSpace && rightWord.rightSpace.rightWord;
-      if (rightWord instanceof WordSup) {
-        this.moveTo(rightWord.leftSpace.nextSpace);
-        return;
-      }
-      else if (rightRightWord instanceof WordSup) {
-        this.moveTo(rightRightWord.leftSpace);
-        return;
-      }
-      this.input(new WordSup(true));
-    }
-    else if (command === '__') {
-      const rightWord = currentSpace.rightWord;
-      const rightRightWord = rightWord && rightWord.rightSpace && rightWord.rightSpace.rightWord;
-      if (rightWord instanceof WordSub) {
-        this.moveTo(rightWord.leftSpace.nextSpace);
-        return;
-      }
-      else if (rightRightWord instanceof WordSub) {
-        this.moveTo(rightRightWord.leftSpace);
-        return;
-      }
-      this.input(new WordSub(true));
-    }
-    else if (command === '\\sqrt') {
-      this.input(new WordSqrt());
-    }
-    else if (command === '\\frac') {
-      this.input(new WordFrac());
-    }
-    else if (command === '\\bar') {
-      this.input(new WordBar());
-    }
-    else if (command === '\\sum') {
-      this.input(new WordPrefix('∑'));
-    }
-    else if (command === '\\log') {
-      this.input(new WordPrefix('log'));
-    }
-    else if (command === '\\ln') {
-      this.input(new WordPrefix('ln'));
-    }
-    else if (command === '\\int') {
-      this.input(new Word('∫', 'int'));
-    }
-    else if (command === '\\oint') {
-      this.input(new Word('∮'));
-    }
-    else if (command === '\\cases') {
-      this.input(new WordMultiLine());
-    }
-    else if (command === '@__@') {
-      const parentWord = this.currentSpace.getParentWord();
-      if (parentWord instanceof WordManualInput) {
-        this.input(new Word('\\'));
-      }
-      else {
-        this.input(new WordManualInput());
-      }
-    }
     else {
+      const parentWord = this.currentSpace.getParentWord();
+      for (let i in fnCommands) {
+        const dataCommand = fnCommands[i].command;
+        const commandList = dataCommand instanceof Array ? dataCommand : [dataCommand];
+
+        for (let j in commandList) {
+          const itemCommand = commandList[j];
+          if (command === itemCommand) {
+            if (!(parentWord instanceof WordManualInput)) {
+              fnCommands[i].processor(this);
+              return;
+            }
+          }
+        }
+      }
+
       for (let i = 0; i < command.length; i++) {
         this.input(new Word(command[i]));
       }
     }
   }
 }
+
+const fnCommands = [
+  {
+    command: '\\',
+    processor: function (cursor) {
+      cursor.input(new WordManualInput());
+    }
+  },
+  {
+    command: '^',
+    processor: function (cursor) {
+      const currentSpace = cursor.currentSpace;
+
+      const rightWord = currentSpace.rightWord;
+      const rightRightWord = rightWord && rightWord.rightSpace && rightWord.rightSpace.rightWord;
+      if (rightWord instanceof WordSup) {
+        cursor.moveTo(rightWord.leftSpace.nextSpace);
+        return;
+      }
+      else if (rightRightWord instanceof WordSup) {
+        cursor.moveTo(rightRightWord.leftSpace);
+        return;
+      }
+      cursor.input(new WordSup(true));
+    }
+  },
+  {
+    command: '_',
+    processor: function (cursor) {
+      const currentSpace = cursor.currentSpace;
+
+      const rightWord = currentSpace.rightWord;
+      const rightRightWord = rightWord && rightWord.rightSpace && rightWord.rightSpace.rightWord;
+      if (rightWord instanceof WordSub) {
+        cursor.moveTo(rightWord.leftSpace.nextSpace);
+        return;
+      }
+      else if (rightRightWord instanceof WordSub) {
+        cursor.moveTo(rightRightWord.leftSpace);
+        return;
+      }
+      cursor.input(new WordSub(true));
+    }
+  },
+  {
+    command: '\\sqrt',
+    processor: function (cursor) {
+      cursor.input(new WordSqrt());
+    }
+  },
+  {
+    command: ['\\frac', '/'],
+    processor: function (cursor) {
+      cursor.input(new WordFrac());
+    }
+  },
+  {
+    command: '\\bar',
+    processor: function (cursor) {
+      cursor.input(new WordBar());
+    }
+  },
+  {
+    command: '\\sum',
+    processor: function (cursor) {
+      cursor.input(new WordPrefix('∑'));
+    }
+  },
+  {
+    command: '\\log',
+    processor: function(cursor) {
+      cursor.input(new WordPrefix('log'));
+    }
+  },
+  {
+    command: '\\ln',
+    processor: function(cursor) {
+      cursor.input(new WordPrefix('ln'));
+    }
+  },
+  {
+    command: '\\int',
+    processor: function(cursor) {
+      cursor.input(new Word('∫', 'int'));
+    }
+  },
+  {
+    command: '\\oint',
+    processor: function(cursor) {
+      cursor.input(new Word('∮'));
+    }
+  },
+  {
+    command: '\\cases',
+    processor: function(cursor) {
+      cursor.input(new WordMultiLine());
+    }
+  }
+];

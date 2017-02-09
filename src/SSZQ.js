@@ -6,7 +6,7 @@ class SSZQ {
   }
 
   init () {
-    this.$dom.attr('sel-field', '');
+    this.$dom.addClass('ssz-field');
     let $root = this.$dom.children('.root');
     if ($root.length < 1) {
       this.$dom.append('<span class="root"></span>');
@@ -17,6 +17,7 @@ class SSZQ {
 
     this.$dom.on('click', (e) => {
       this.focus();
+      e.stopPropagation();
     });
 
 

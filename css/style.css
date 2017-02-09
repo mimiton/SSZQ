@@ -176,5 +176,9 @@
 .word-manual-input {
     display: inline-block;
     padding: 1px;
+    margin-right: 1px;
     border: 1px solid #67d1ff;
+}
+.word-manual-input > .content {
+    display: block;
 }

@@ -25,19 +25,7 @@ class CursorInput {
       let stop = true;
       const code = e.keyCode;
 //      console.log(code);
-      if (code === 54 && e.shiftKey) {
-        this.handlerCursor.command('^^');
-      }
-      else if (code === 189 && e.shiftKey) {
-        this.handlerCursor.command('__');
-      }
-      else if (code === 191) {
-        this.handlerCursor.command('\\frac');
-      }
-      else if (code === 220) {
-        this.handlerCursor.command('@__@');
-      }
-      else if (code === CursorInput.KEY_LEFT) {
+      if (code === CursorInput.KEY_LEFT) {
         this.handlerCursor.command('<=');
       }
       else if (code === CursorInput.KEY_RIGHT) {
