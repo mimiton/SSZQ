@@ -136,12 +136,11 @@ class Cursor {
     this.moveTo(this.currentSpace, offset < 0 ? 'prev' : 'next');
   }
 
-  command (command) {
+  command (command, extraData) {
     const currentSpace = this.currentSpace;
     if (!currentSpace) {
       return;
     }
-
 
     if (command === '<=') {
       this.move(-1);
@@ -175,7 +174,7 @@ class Cursor {
           const itemCommand = commandList[j];
           if (command === itemCommand) {
             if (!(parentWord instanceof WordManualInput)) {
-              fnCommands[i].processor(this);
+              fnCommands[i].processor(this, extraData);
               return;
             }
           }
@@ -190,6 +189,12 @@ class Cursor {
 }
 
 const fnCommands = [
+  {
+    command: '[file]',
+    processor: function (cursor, extraData) {
+      cursor.input(new WordImage(extraData));
+    }
+  },
   {
     command: '\\',
     processor: function (cursor) {

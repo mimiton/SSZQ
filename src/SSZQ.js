@@ -27,6 +27,14 @@ class SSZQ {
         this.blur();
       }
     });
+
+    this.$dom.on('dragover', (e) => {
+      e.preventDefault();
+    }).on('drop', (e) => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      this.cursor.command('[file]', file);
+    });
   }
 
   editable () {

@@ -5,6 +5,20 @@ class CursorInput {
     $('body').append(this.$dom);
 
     let locked;
+    this.$dom.on('paste', (e) => {
+      const items = e.clipboardData.items;
+      let item;
+      let count = 0;
+      while (items[count]) {
+        item = items[count];
+        if (item && item.kind === 'file' && item.type.indexOf('image') === 0) {
+          self.handlerCursor.command('[file]', item.getAsFile());
+          e.preventDefault();
+          return;
+        }
+        count ++;
+      }
+    });
     this.$dom.on('compositionstart', function () {
       locked = true;
     });
