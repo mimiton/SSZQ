@@ -11,25 +11,66 @@ class Space {
     }
   }
 
-  putDOM ($dom) {
+  getDOMPutRule () {
+    let targetDOM;
+    let direction;
     const { leftWord, rightWord, parentElem } = this;
 
+    if (leftWord && rightWord) {
+      const $leftWordDOM = leftWord.get$dom();
+      const $rightWordDOM = rightWord.get$dom();
+
+      if (
+        $leftWordDOM.hasAttr('attr-has_container')
+        &&
+        $rightWordDOM.hasAttr('attr-has_container')
+        &&
+        $leftWordDOM.parent()[0] === $rightWordDOM.parent()[0]
+        ) {
+        return false;
+      }
+    }
+
     if (parentElem) {
-      $(parentElem).append($dom);
+      targetDOM = parentElem;
+      direction = 'inner';
     }
     else if (leftWord) {
-      leftWord.get$dom().after($dom);
+      const $leftWordDOM = leftWord.get$dom();
+      if ($leftWordDOM.hasAttr('attr-has_container')) {
+        targetDOM = $leftWordDOM.parent()[0];
+        direction = 'right';
+      }
+      else {
+        targetDOM = $leftWordDOM[0];
+        direction = 'right';
+      }
     }
     else if (rightWord) {
-      rightWord.get$dom().before($dom);
+      const $rightWordDOM = rightWord.get$dom();
+      if ($rightWordDOM.hasAttr('attr-cursor_jump_over')) {
+        targetDOM = $rightWordDOM.parent()[0];
+        direction = 'left';
+      }
+      else {
+        targetDOM = $rightWordDOM[0];
+        direction = 'left';
+      }
+    }
+
+    if (targetDOM && direction) {
+      return {
+        targetDOM,
+        direction
+      }
+    }
+    else {
+      return false;
     }
   }
 
   putWord (word) {
-    const $dom = word.get$dom();
-
-    this.putDOM($dom);
-
+    word.putToSpace(this);
 
     this._removeEmpty();
     const newSpace = new Space();

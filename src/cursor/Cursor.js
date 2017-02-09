@@ -79,17 +79,46 @@ class Cursor {
     this.moveTo(spaceToDropCursor);
   }
 
-  moveTo (space) {
+  moveTo (space, dire) {
 //    print(space);
-    const $dom = this.$dom;
+    let direction = dire || 'next';
     this.currentSpace = space;
 //    console.log('cursor move to:', space);
 
     this.activate();
-    space.putDOM($dom);
+    while(!this.putToSpace(this.currentSpace)) {
+      const next = this.currentSpace[direction + 'Space'];
+      if (next) {
+        this.currentSpace = next;
+      }
+      else {
+        break;
+      }
+    }
 
     this.blink = true;
     this.freeze();
+  }
+
+  putToSpace (space) {
+    const { targetDOM, direction } = space.getDOMPutRule();
+    const $dom = this.$dom;
+
+    switch (direction) {
+      case 'inner':
+        $(targetDOM).append($dom);
+        break;
+      case 'left':
+        $(targetDOM).before($dom);
+        break;
+      case 'right':
+        $(targetDOM).after($dom);
+        break;
+      default:
+        return false;
+    }
+
+    return true;
   }
   moveUpDown (offset) {
   }
@@ -104,7 +133,7 @@ class Cursor {
         this.currentSpace = this.currentSpace.nextSpace || this.currentSpace;
       }
     }
-    this.moveTo(this.currentSpace);
+    this.moveTo(this.currentSpace, offset < 0 ? 'prev' : 'next');
   }
 
   command (command) {
@@ -114,22 +143,30 @@ class Cursor {
     }
 
     if (command === '^^') {
-      if (currentSpace.rightWord && currentSpace.rightWord instanceof WordSupSub) {
-        currentSpace.rightWord.addSupWord(true);
-        this.moveTo(currentSpace.rightWord.startSpace);
+      const rightWord = currentSpace.rightWord;
+      const rightRightWord = rightWord && rightWord.rightSpace && rightWord.rightSpace.rightWord;
+      if (rightWord instanceof WordSup) {
+        this.moveTo(rightWord.leftSpace.nextSpace);
+        return;
       }
-      else {
-        this.input(new WordSupSub(true));
+      else if (rightRightWord instanceof WordSup) {
+        this.moveTo(rightRightWord.leftSpace);
+        return;
       }
+      this.input(new WordSup(true));
     }
     else if (command === '__') {
-      if (currentSpace.rightWord && currentSpace.rightWord instanceof WordSupSub) {
-        currentSpace.rightWord.addSubWord(true);
-        this.moveTo(currentSpace.rightWord.endSpace);
+      const rightWord = currentSpace.rightWord;
+      const rightRightWord = rightWord && rightWord.rightSpace && rightWord.rightSpace.rightWord;
+      if (rightWord instanceof WordSub) {
+        this.moveTo(rightWord.leftSpace.nextSpace);
+        return;
       }
-      else {
-        this.input(new WordSupSub(false, true));
+      else if (rightRightWord instanceof WordSub) {
+        this.moveTo(rightRightWord.leftSpace);
+        return;
       }
+      this.input(new WordSub(true));
     }
     else if (command === '<=') {
       this.move(-1);

@@ -48,7 +48,7 @@
     display: inline-block;
     font-size: 90%;
     text-align: center;
-    vertical-align: inherit;
+    vertical-align: middle;
     position: relative;
     top: -0.12em;
 }
@@ -71,11 +71,12 @@
 .supsub {
     display: inline-block;
     font-size: 90%;
+    vertical-align: middle;
 }
-.supsub.has-sup {
+.supsub.sup-only {
     vertical-align: 0.5em;
 }
-.supsub.has-sub {
+.supsub.sub-only {
     vertical-align: -0.7em;
 }
 .supsub > * {

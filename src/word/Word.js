@@ -45,6 +45,23 @@ class Word {
     this.relativeCursor = cursor;
   }
 
+  putToSpace (space) {
+    const { targetDOM, direction } = space.getDOMPutRule();
+    const $dom = this.get$dom();
+
+    switch (direction) {
+      case 'inner':
+        $(targetDOM).append($dom);
+        break;
+      case 'left':
+        $(targetDOM).before($dom);
+        break;
+      case 'right':
+        $(targetDOM).after($dom);
+        break;
+    }
+  }
+
   dettachFromLeftSpace () {
     if (this.leftSpace) {
       delete this.leftSpace.rightWord;
